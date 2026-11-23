@@ -1,0 +1,256 @@
+/* fx.css — shared "modern game" finish: post-processing layers and menu
+   components. Every class starts with fx- so it never collides with a game's
+   own styles. A game sets its accent colours with --fx-a (primary) and --fx-b
+   (secondary) on any ancestor. */
+
+:where(:root) {
+  --fx-a: #ffb02e;
+  --fx-b: #4fd1ff;
+  --fx-ink: #0a0d18;
+  --fx-glass: rgba(14, 18, 34, 0.72);
+  --fx-line: rgba(255, 255, 255, 0.12);
+}
+
+/* ------------------------------------------------------- post-processing */
+
+.fx-bloom, .fx-grade, .fx-flash {
+  position: absolute;
+  pointer-events: none;
+}
+.fx-bloom { mix-blend-mode: screen; image-rendering: auto; z-index: 1; }
+.fx-grade { z-index: 2; }
+.fx-flash { z-index: 3; opacity: 0; }
+
+.fx-grain::after {
+  content: "";
+  position: absolute; inset: -50%;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .5 0 0 0 0 .5 0 0 0 0 .5 0 0 0 .6 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity: 0.07;
+  mix-blend-mode: overlay;
+  animation: fx-grain 0.9s steps(5) infinite;
+}
+@keyframes fx-grain {
+  0% { transform: translate(0, 0); } 20% { transform: translate(-6%, 4%); } 40% { transform: translate(5%, -7%); }
+  60% { transform: translate(-3%, -4%); } 80% { transform: translate(7%, 6%); } 100% { transform: translate(0, 0); }
+}
+.fx-grade { overflow: hidden; }
+.fx-scanlines::before {
+  content: "";
+  position: absolute; inset: 0;
+  background: repeating-linear-gradient(to bottom, rgba(0, 0, 0, 0.16) 0 1px, transparent 1px 3px);
+  mix-blend-mode: multiply;
+  opacity: 0.55;
+}
+
+/* --------------------------------------------------- animated backdrops */
+
+/* Drop <div class="fx-backdrop"></div> behind a menu: slow aurora, a
+   perspective grid and drifting sparks, all CSS. */
+.fx-backdrop {
+  position: absolute; inset: 0; overflow: hidden; pointer-events: none;
+  background:
+    radial-gradient(60% 50% at 20% 20%, color-mix(in srgb, var(--fx-a) 28%, transparent), transparent 70%),
+    radial-gradient(55% 45% at 85% 30%, color-mix(in srgb, var(--fx-b) 24%, transparent), transparent 70%),
+    radial-gradient(80% 60% at 50% 110%, color-mix(in srgb, var(--fx-a) 18%, transparent), transparent 70%),
+    var(--fx-ink);
+  animation: fx-aurora 18s ease-in-out infinite alternate;
+  background-size: 140% 140%, 140% 140%, 100% 100%, auto;
+}
+@keyframes fx-aurora {
+  from { background-position: 0% 0%, 100% 0%, 50% 100%, 0 0; }
+  to { background-position: 30% 20%, 70% 30%, 50% 80%, 0 0; }
+}
+.fx-backdrop::before {
+  /* a glowing floor grid receding to the horizon */
+  content: "";
+  position: absolute; left: -50%; right: -50%; bottom: -10%; height: 60%;
+  background:
+    repeating-linear-gradient(90deg, color-mix(in srgb, var(--fx-b) 40%, transparent) 0 1px, transparent 1px 64px),
+    repeating-linear-gradient(0deg, color-mix(in srgb, var(--fx-b) 40%, transparent) 0 1px, transparent 1px 64px);
+  transform: perspective(420px) rotateX(62deg);
+  transform-origin: 50% 0;
+  mask-image: linear-gradient(to bottom, transparent, #000 35%, #000 70%, transparent);
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 35%, #000 70%, transparent);
+  opacity: 0.35;
+  animation: fx-grid 3.2s linear infinite;
+}
+@keyframes fx-grid { to { background-position: 0 64px, 0 64px; } }
+.fx-backdrop::after {
+  /* drifting sparks */
+  content: "";
+  position: absolute; inset: -20%;
+  background-image:
+    radial-gradient(2px 2px at 10% 20%, #fff, transparent), radial-gradient(1.5px 1.5px at 30% 70%, var(--fx-a), transparent),
+    radial-gradient(2px 2px at 55% 35%, var(--fx-b), transparent), radial-gradient(1.5px 1.5px at 75% 80%, #fff, transparent),
+    radial-gradient(2px 2px at 90% 15%, var(--fx-a), transparent), radial-gradient(1.5px 1.5px at 42% 92%, var(--fx-b), transparent),
+    radial-gradient(1.5px 1.5px at 66% 58%, #fff, transparent), radial-gradient(2px 2px at 18% 48%, var(--fx-b), transparent);
+  background-size: 420px 420px;
+  opacity: 0.7;
+  animation: fx-sparks 26s linear infinite;
+}
+@keyframes fx-sparks { to { transform: translateY(-420px); } }
+
+/* ------------------------------------------------------------- the logo */
+
+.fx-logo {
+  position: relative;
+  font-weight: 900;
+  letter-spacing: 0.02em;
+  /* room above for stacked Vietnamese marks (Ế, Ấ, Ổ): text clipped to a gradient
+     is cut at the box edge, so the box must reach above the tallest accent */
+  line-height: 1.18;
+  padding: 0.14em 0.04em 0.02em;
+  text-transform: uppercase;
+  background: linear-gradient(180deg, #ffffff 0%, #e8eefc 38%, #8f9bbd 52%, #ffffff 62%, #c9d3ee 100%);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  filter: drop-shadow(0 2px 0 rgba(0, 0, 0, 0.6)) drop-shadow(0 0 18px color-mix(in srgb, var(--fx-a) 45%, transparent));
+}
+.fx-logo .fx-hot, .fx-logo span {
+  background: linear-gradient(180deg, #fff6d8 0%, var(--fx-a) 45%, color-mix(in srgb, var(--fx-a) 60%, #7a1d00) 100%);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.fx-logo::after {
+  /* a light sweep across the letters every few seconds */
+  content: attr(data-text);
+  position: absolute; inset: 0;
+  background: linear-gradient(105deg, transparent 40%, rgba(255, 255, 255, 0.95) 50%, transparent 60%);
+  background-size: 250% 100%;
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  animation: fx-sweep 4.5s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes fx-sweep { 0%, 55% { background-position: 120% 0; } 100% { background-position: -30% 0; } }
+.fx-tagline {
+  display: inline-flex; align-items: center; gap: 10px;
+  font: 800 12px/1 "Segoe UI", system-ui, sans-serif;
+  letter-spacing: 0.32em; text-transform: uppercase;
+  color: var(--fx-b);
+}
+.fx-tagline::before, .fx-tagline::after {
+  content: ""; width: 34px; height: 1px;
+  background: linear-gradient(90deg, transparent, currentColor);
+}
+.fx-tagline::after { transform: scaleX(-1); }
+
+/* ---------------------------------------------------------------- panels */
+
+.fx-panel {
+  position: relative;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0) 40%),
+    var(--fx-glass);
+  border: 1px solid var(--fx-line);
+  box-shadow:
+    0 30px 80px rgba(0, 0, 0, 0.55),
+    0 0 0 1px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(16px) saturate(1.3);
+  -webkit-backdrop-filter: blur(16px) saturate(1.3);
+  animation: fx-panel-in 0.45s cubic-bezier(.2, 1.1, .3, 1) both;
+}
+.fx-panel::before {
+  /* a thin gradient frame that catches the light at the corners */
+  content: "";
+  position: absolute; inset: -1px; border-radius: inherit; padding: 1px; pointer-events: none;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--fx-a) 80%, transparent), transparent 30%, transparent 70%, color-mix(in srgb, var(--fx-b) 70%, transparent));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude;
+}
+@keyframes fx-panel-in { from { opacity: 0; transform: translateY(18px) scale(0.97); filter: blur(6px); } }
+
+/* --------------------------------------------------------------- buttons */
+
+.fx-btn {
+  position: relative; overflow: hidden; isolation: isolate;
+  border: 0 !important;
+  border-radius: 12px;
+  padding: 13px 26px;
+  font-weight: 900 !important;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #1a0d00 !important;
+  background: linear-gradient(180deg, #fff3c4 0%, var(--fx-a) 48%, color-mix(in srgb, var(--fx-a) 70%, #6b2500) 100%) !important;
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.35),
+    0 6px 0 color-mix(in srgb, var(--fx-a) 45%, #2a0e00),
+    0 12px 28px color-mix(in srgb, var(--fx-a) 35%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8) !important;
+  cursor: pointer;
+  transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.15s ease;
+}
+.fx-btn::after {
+  content: "";
+  position: absolute; inset: 0; z-index: -1;
+  background: linear-gradient(110deg, transparent 30%, rgba(255, 255, 255, 0.75) 48%, transparent 66%);
+  transform: translateX(-120%);
+  transition: transform 0.6s ease;
+}
+.fx-btn:hover { filter: brightness(1.08); transform: translateY(-2px); }
+.fx-btn:hover::after { transform: translateX(120%); }
+.fx-btn:active { transform: translateY(4px); box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.35), 0 2px 0 color-mix(in srgb, var(--fx-a) 45%, #2a0e00), inset 0 1px 0 rgba(255, 255, 255, 0.6) !important; }
+.fx-btn:focus-visible { outline: 3px solid var(--fx-b); outline-offset: 3px; }
+.fx-btn.fx-idle { animation: fx-breathe 2.4s ease-in-out infinite; }
+@keyframes fx-breathe { 50% { box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.35), 0 6px 0 color-mix(in srgb, var(--fx-a) 45%, #2a0e00), 0 0 36px 6px color-mix(in srgb, var(--fx-a) 55%, transparent), inset 0 1px 0 rgba(255, 255, 255, 0.8); } }
+
+.fx-btn-ghost {
+  border-radius: 12px;
+  border: 1px solid var(--fx-line) !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+  backdrop-filter: blur(6px);
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.12s ease;
+}
+.fx-btn-ghost:hover { background: rgba(255, 255, 255, 0.11) !important; border-color: color-mix(in srgb, var(--fx-b) 60%, transparent) !important; transform: translateY(-1px); }
+
+/* ----------------------------------------------------------------- cards */
+
+.fx-card {
+  position: relative; overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+.fx-card::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(120deg, transparent 35%, rgba(255, 255, 255, 0.14) 50%, transparent 65%);
+  transform: translateX(-100%); transition: transform 0.7s ease;
+}
+.fx-card:hover:not(:disabled) { transform: translateY(-4px); box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45), 0 0 0 1px color-mix(in srgb, var(--fx-b) 50%, transparent); }
+.fx-card:hover:not(:disabled)::after { transform: translateX(100%); }
+
+/* ------------------------------------------------------------ keycaps */
+
+.fx-keys kbd, kbd.fx-key {
+  display: inline-grid; place-items: center; min-width: 26px; height: 26px; padding: 0 6px;
+  border-radius: 7px;
+  font: 800 11px/1 ui-monospace, Consolas, monospace;
+  color: #e9eefc;
+  background: linear-gradient(180deg, #3a4260, #22283d);
+  box-shadow: 0 3px 0 #10131f, inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(0, 0, 0, 0.5);
+}
+
+/* ------------------------------------------------- level banner / wipe */
+
+.fx-banner {
+  position: absolute; left: 0; right: 0; top: 50%; z-index: 4;
+  transform: translateY(-50%);
+  display: grid; place-items: center; gap: 4px;
+  padding: 18px 0;
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent, rgba(0, 0, 0, 0.72) 15%, rgba(0, 0, 0, 0.72) 85%, transparent);
+  animation: fx-banner 2.4s cubic-bezier(.2, .9, .2, 1) both;
+}
+.fx-banner b {
+  font: 900 clamp(26px, 5vw, 54px)/1 "Segoe UI", system-ui, sans-serif; letter-spacing: 0.08em; text-transform: uppercase;
+  background: linear-gradient(180deg, #fff, var(--fx-a)); -webkit-background-clip: text; background-clip: text; color: transparent;
+  filter: drop-shadow(0 0 16px color-mix(in srgb, var(--fx-a) 60%, transparent));
+}
+.fx-banner small { font: 800 12px/1 "Segoe UI", system-ui, sans-serif; letter-spacing: 0.4em; color: var(--fx-b); text-transform: uppercase; }
+@keyframes fx-banner {
+  0% { opacity: 0; clip-path: inset(0 50% 0 50%); }
+  15% { opacity: 1; clip-path: inset(0 0 0 0); }
+  80% { opacity: 1; clip-path: inset(0 0 0 0); }
+  100% { opacity: 0; clip-path: inset(0 0 0 0); transform: translateY(-50%) scale(1.04); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fx-backdrop, .fx-backdrop::before, .fx-backdrop::after, .fx-logo::after, .fx-btn.fx-idle, .fx-grain::after { animation: none !important; }
+}

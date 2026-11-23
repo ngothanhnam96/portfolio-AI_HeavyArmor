@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Thép Lửa · Heavy Armor</title>
+  <meta name="description" content="Thép Lửa — game xe tăng bắn máy bay kiểu arcade, vẽ hoàn toàn bằng code ngay trên trình duyệt. Bốn chiến trường, bốn boss khổng lồ, nâng cấp vũ khí và bom hạt nhân.">
+  <meta name="theme-color" content="#120c08">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="src/ui/fx/fx.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main id="app">
+    <div id="stage">
+      <canvas id="game" role="img" aria-label="Thép Lửa — chiến trường"></canvas>
+      <div id="hud" class="hud" hidden>
+        <div class="hud-top">
+          <div class="hud-score">
+            <span class="hud-label">ĐIỂM</span>
+            <b id="hud-score">0</b>
+            <span class="hud-combo" id="hud-combo"></span>
+          </div>
+          <div class="hud-stage">
+            <div class="hud-chip" id="hud-stage">MÀN 1 · ĐỒNG LÚA</div>
+            <div class="hud-bar"><i id="hud-progress"></i></div>
+          </div>
+          <div class="hud-right">
+            <div class="hud-lives" id="hud-lives" aria-label="Số xe tăng còn lại"></div>
+            <div class="hud-nukes" id="hud-nukes" aria-label="Bom hạt nhân"></div>
+          </div>
+        </div>
+        <div class="hud-boss" id="hud-boss" hidden>
+          <div class="hud-boss-row"><span id="hud-boss-name"></span><span id="hud-boss-hp"></span></div>
+          <div class="hud-boss-bar"><i id="hud-boss-fill"></i><i id="hud-boss-lag" class="lag"></i></div>
+          <div class="hud-boss-parts" id="hud-boss-parts"></div>
+        </div>
+        <div class="hud-bottom">
+          <div class="hud-armor">
+            <span class="hud-label">GIÁP</span>
+            <div class="armor-bar"><i id="hud-armor"></i></div>
+            <div class="hud-shield" id="hud-shield"></div>
+          </div>
+          <div class="hud-kit" id="hud-kit"></div>
+        </div>
+        <div class="touch" id="touch" hidden>
+          <div class="touch-move">
+            <button class="touch-btn" id="touch-left" aria-label="Sang trái">◀</button>
+            <button class="touch-btn" id="touch-right" aria-label="Sang phải">▶</button>
+          </div>
+          <div class="touch-aim" id="touch-aim" aria-label="Chạm để ngắm và bắn"></div>
+          <button class="touch-btn nuke" id="touch-nuke" aria-label="Bom hạt nhân">☢</button>
+          <button class="touch-btn pause" id="touch-pause" aria-label="Tạm dừng">❚❚</button>
+        </div>
+        <div id="toast" class="toast" role="status" aria-live="polite"></div>
+      </div>
+    </div>
+    <p id="keys" class="keys">
+      <kbd>A</kbd><kbd>D</kbd> chạy · <b>chuột</b> ngắm · giữ <b>chuột trái</b> / <kbd>Space</kbd> bắn ·
+      <kbd>←</kbd><kbd>→</kbd> xoay nòng · <kbd>X</kbd> bom hạt nhân · <kbd>P</kbd> tạm dừng · <kbd>M</kbd> âm thanh
+    </p>
+  </main>
+
+  <div id="modal" class="modal" hidden>
+    <div class="modal-card fx-panel" id="modal-body" role="dialog" aria-modal="true" aria-label="Thép Lửa"></div>
+  </div>
+
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>

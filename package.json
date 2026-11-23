@@ -1,0 +1,15 @@
+{
+  "name": "thep-lua-heavy-armor",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Thép Lửa — an original browser tank-versus-air arcade shooter, drawn entirely in code.",
+  "type": "module",
+  "license": "MIT",
+  "scripts": {
+    "start": "node scripts/serve.mjs",
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
