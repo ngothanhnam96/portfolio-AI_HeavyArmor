@@ -461,9 +461,11 @@ export function createRenderer(canvas) {
       ctx.font = `900 ${f.big ? 18 * s : 13}px "Segoe UI", system-ui, sans-serif`;
       ctx.lineWidth = 3;
       ctx.strokeStyle = "rgba(0,0,0,.6)";
-      ctx.strokeText(f.text, f.x, f.y);
+      const half = ctx.measureText(f.text).width / 2 + 6;
+      const fx = Math.max(half, Math.min(W - half, f.x));
+      ctx.strokeText(f.text, fx, f.y);
       ctx.fillStyle = f.color;
-      ctx.fillText(f.text, f.x, f.y);
+      ctx.fillText(f.text, fx, f.y);
     }
     ctx.globalAlpha = 1;
 
@@ -523,10 +525,15 @@ export function createRenderer(canvas) {
     for (const p of parts) {
       if (p.k === "smoke") {
         const k = p.t / p.life;
-        const a = (1 - k) * 0.5;
-        const v = Math.round(90 - 70 * (p.dark ?? 0.3));
-        ctx.fillStyle = `rgba(${v},${v - 4},${v - 8},${a})`;
-        ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, TAU); ctx.fill();
+        // soft puffs: a fade-in, then a long fade-out; lighter and warmer as they age
+        const a = Math.min(1, k * 8) * (1 - k) * 0.42;
+        const v = Math.round(110 - 70 * (p.dark ?? 0.3) + 50 * k);
+        const gr = ctx.createRadialGradient(p.x - p.r * 0.25, p.y - p.r * 0.3, p.r * 0.1, p.x, p.y, p.r);
+        gr.addColorStop(0, `rgba(${v + 30},${v + 26},${v + 22},${a})`);
+        gr.addColorStop(0.6, `rgba(${v},${v - 4},${v - 8},${a * 0.8})`);
+        gr.addColorStop(1, `rgba(${v},${v - 4},${v - 8},0)`);
+        ctx.fillStyle = gr;
+        ctx.fillRect(p.x - p.r, p.y - p.r, p.r * 2, p.r * 2);
       } else if (p.k === "dust") {
         const a = (1 - p.t / p.life) * 0.4;
         ctx.fillStyle = `rgba(150,120,85,${a})`;

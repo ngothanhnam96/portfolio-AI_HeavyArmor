@@ -73,7 +73,8 @@ npm test     # 37 tests, no dependencies
 
 Node 20+. URL options: `?debug` exposes `window.__ha`; `?seed=7` fixes the RNG;
 `?play=dunes` jumps to a stage (`paddy`, `dunes`, `karst`, `city`); `?autopilot` lets the bot
-drive (for demos and screenshots); `?touch` forces the touch controls on.
+drive (for demos and screenshots); `?ff=40` fast-forwards 40 s of play; `?touch` forces the touch
+controls on.
 
 ## What the tests prove
 

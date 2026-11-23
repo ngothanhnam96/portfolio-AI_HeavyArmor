@@ -9,7 +9,8 @@
   do not load from `file://`.
 - **URL options:** `?debug` exposes `window.__ha` (`game`, `start(i)`, `clear()`,
   `autopilot(on)`); `?seed=7` fixes the RNG; `?play=<stage id>` starts a stage (`paddy`,
-  `dunes`, `karst`, `city`); `?autopilot` lets the bot drive; `?autofire` holds the trigger;
+  `dunes`, `karst`, `city`); `?autopilot` lets the bot drive; `?ff=40` (with `?play`) fast-forwards 40 s of autopilot play,
+  handy for screenshots; `?autofire` holds the trigger;
   `?touch` forces the touch controls on.
 - **Storage:** `localStorage` under the `heavyarmor:` prefix (`scores`, `difficulty`,
   `muted`, `initials`). Private windows and blocked storage still play.

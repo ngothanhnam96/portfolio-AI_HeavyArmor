@@ -202,7 +202,34 @@ function startPlay(stageIndex = 0) {
   screen = "play";
   closeModal();
   $("hud").hidden = false;
+  stageLook();
   bannerStage();
+}
+
+// Post-processing per stage: bright daylight needs a tighter bloom than the night city.
+const LOOKS = {
+  paddy: { bloom: 0.32, exposure: 0.55, spill: 0.12, tint: "rgba(255,150,80,.04)", haze: "rgba(255,140,60,.08)" },
+  dunes: { bloom: 0.26, exposure: 0.5, spill: 0.1, tint: "rgba(255,200,120,.03)", haze: "rgba(255,190,110,.08)" },
+  karst: { bloom: 0.4, exposure: 0.62, spill: 0.2, tint: "rgba(255,90,90,.05)", haze: "rgba(255,90,60,.1)" },
+  city: { bloom: 0.6, exposure: 0.8, spill: 0.35, tint: "rgba(90,80,255,.05)", haze: "rgba(140,60,255,.1)" },
+};
+let lookId = "";
+function stageLook() {
+  const g = screen === "title" ? attract : game;
+  if (!g || g.stage.id === lookId) return;
+  lookId = g.stage.id;
+  post.set(LOOKS[lookId]);
+}
+
+/** Debug: `?ff=40` lets the autopilot play 40 s instantly, so screenshots show the action. */
+function fastForward(seconds) {
+  const bot = createBot();
+  const n = Math.round(seconds / DT);
+  for (let i = 0; i < n && game.status === "playing"; i++) {
+    const ev = step(game, bot(game));
+    if (n - i < 240) renderer.onEvents(ev, game);
+    if (n - i < 240) renderer.update(DT, game, true);
+  }
 }
 
 function pause() {
@@ -249,6 +276,7 @@ function frame(now) {
     if (n >= 12) acc = 0;
   }
   if (g) {
+    stageLook();
     renderer.update(dt, g, running);
     renderer.render(g, { reticle: reticle() });
     post.frame();
@@ -386,6 +414,7 @@ function updateHud() {
   const bossEl = $("hud-boss");
   if (b && !b.entering) {
     bossEl.hidden = false;
+    $("hud").classList.add("boss");
     setText("hud-boss-name", b.def.name.toUpperCase());
     const f = b.hp / b.maxHp;
     setText("hud-boss-hp", `${Math.ceil(f * 100)}%`);
@@ -400,6 +429,7 @@ function updateHud() {
     setHtml("hud-boss-parts", b.parts.map((p) => `<span class="part-pip${p.alive ? "" : " dead"}">${esc(p.label)}</span>`).join("") + (armored ? `<span class="part-pip">🛡 GIÁP</span>` : ""));
   } else {
     bossEl.hidden = true;
+    $("hud").classList.remove("boss");
   }
 }
 
@@ -611,6 +641,9 @@ if (params.has("debug")) {
   };
 }
 const play = params.get("play");
-if (play && stageById(play)) startPlay(STAGES.indexOf(stageById(play)));
+if (play && stageById(play)) {
+  startPlay(STAGES.indexOf(stageById(play)));
+  if (params.has("ff")) fastForward(Number(params.get("ff")) || 30);
+}
 else showTitle();
 requestAnimationFrame((t) => { last = t; frame(t); });

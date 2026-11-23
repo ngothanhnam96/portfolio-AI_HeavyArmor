@@ -1431,11 +1431,11 @@ function paintPaddy(far, mid, near, gy, th, r) {
   hazeOver(mid, gy - 120, gy, "rgba(255,200,160,.12)");
   // near: paddy water strip, dykes, bamboo clumps and stilt houses
   const water = near.createLinearGradient(0, gy - 40, 0, gy);
-  water.addColorStop(0, "#d9a88a");
-  water.addColorStop(1, "#7aa0b5");
+  water.addColorStop(0, "#c48a70");
+  water.addColorStop(1, "#557a90");
   near.fillStyle = water;
   near.fillRect(0, gy - 36, TILE, 40);
-  near.fillStyle = "rgba(255,230,190,.35)";
+  near.fillStyle = "rgba(255,225,180,.28)";
   for (let i = 0; i < 80; i++) near.fillRect(r() * TILE, gy - 34 + r() * 30, 10 + r() * 30, 1);
   // rice seedlings rows
   near.fillStyle = "#5f8a3a";
@@ -1660,8 +1660,8 @@ function paintCity(far, mid, near, gy, th, r) {
   const neon = ["#ff3fa4", "#3ff2ff", "#ffe04a", "#7cff6b"];
   const words = ["PHỞ", "CAFÉ", "KARAOKE", "BÁNH MÌ", "HOTEL", "24H"];
   for (let i = 0; i < 9; i++) {
-    const x = r() * (TILE - 100) + 50;
-    const y = gy - 60 - r() * 60;
+    const x = (i + 0.5) * (TILE / 9) + (r() - 0.5) * 50;
+    const y = gy - 62 - (i % 3) * 26 - r() * 10;
     const col = neon[i % neon.length];
     const word = words[i % words.length];
     near.save();
